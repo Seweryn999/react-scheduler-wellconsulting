@@ -18,7 +18,7 @@
     "@devexpress/dx-react-scheduler-material-ui": "^4.0.8",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
-    "@mui/x-date-pickers": "^7.12.1",
+    "@mui/x-date-pickers": "^5.0.15",
     "date-fns": "^2.30.0",
     "firebase": "^10.12.5",
     "react": "^18.3.1",
