@@ -9,6 +9,8 @@ import {
   DateNavigator,
   ViewSwitcher,
   AppointmentTooltip,
+  AppointmentForm,
+  ConfirmationDialog,
 } from "@devexpress/dx-react-scheduler-material-ui";
 import {
   ViewState,
@@ -23,9 +25,6 @@ const SchedulerComponent = ({
   setCurrentDate,
   setCurrentViewName,
   commitChanges,
-  onEditAppointment,
-  onDeleteAppointment,
-  onAppointmentClick,
 }) => (
   <Scheduler data={data}>
     <ViewState
@@ -39,13 +38,10 @@ const SchedulerComponent = ({
     <DayView startDayHour={9} endDayHour={14} />
     <WeekView startDayHour={9} endDayHour={14} />
     <MonthView />
-    <Appointments onAppointmentClick={onAppointmentClick} />
-    <AppointmentTooltip
-      showOpenButton
-      showDeleteButton
-      onOpenButtonClick={onEditAppointment}
-      onDeleteButtonClick={onDeleteAppointment}
-    />
+    <ConfirmationDialog />
+    <Appointments />
+    <AppointmentTooltip showOpenButton showDeleteButton />
+    <AppointmentForm />
     <Toolbar />
     <DateNavigator />
     <ViewSwitcher />
@@ -62,9 +58,6 @@ SchedulerComponent.propTypes = {
   setCurrentDate: PropTypes.func.isRequired,
   setCurrentViewName: PropTypes.func.isRequired,
   commitChanges: PropTypes.func.isRequired,
-  onEditAppointment: PropTypes.func.isRequired,
-  onDeleteAppointment: PropTypes.func.isRequired,
-  onAppointmentClick: PropTypes.func.isRequired,
 };
 
 export default SchedulerComponent;

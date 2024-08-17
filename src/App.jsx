@@ -121,11 +121,15 @@ const MySchedulerComponent = () => {
     }
   };
 
-  const handleDeleteEvent = async () => {
-    if (selectedAppointment?.id) {
-      await commitChanges({ deleted: selectedAppointment.id });
+  const handleDeleteEvent = () => {
+    if (selectedAppointment && selectedAppointment.id) {
+      commitChanges({ deleted: selectedAppointment.id });
       setSelectedAppointment(null);
     }
+  };
+
+  const handleAppointmentClick = (appointment) => {
+    setSelectedAppointment(appointment);
   };
 
   const handleSaveEvent = async () => {
@@ -138,22 +142,19 @@ const MySchedulerComponent = () => {
     setCurrentEvent({ title: "", startDate: "", endDate: "", id: null });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentEvent({ ...currentEvent, [name]: value });
-  };
-
-  const handleAppointmentClick = (appointment) => {
-    setSelectedAppointment(appointment);
+  const handleEventChange = (e) => {
+    setCurrentEvent({
+      ...currentEvent,
+      [e.target.name]: e.target.value,
+    });
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={plLocale}>
+    <LocalizationProvider dateAdapter={AdapterDateFns} locale={plLocale}>
       <Paper>
         <ToolbarComponent
           onAddEvent={handleAddEvent}
           onDateChange={handleDateChange}
-          onDeleteEvent={handleDeleteEvent}
         />
         <SchedulerComponent
           data={data}
@@ -171,7 +172,7 @@ const MySchedulerComponent = () => {
           open={openDialog}
           onClose={() => setOpenDialog(false)}
           event={currentEvent}
-          onChange={handleInputChange}
+          onChange={handleEventChange}
           onSave={handleSaveEvent}
           isEditing={isEditing}
         />
@@ -179,7 +180,5 @@ const MySchedulerComponent = () => {
     </LocalizationProvider>
   );
 };
-
-MySchedulerComponent.displayName = "MySchedulerComponent";
 
 export default MySchedulerComponent;
