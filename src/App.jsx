@@ -152,7 +152,7 @@ const MySchedulerComponent = () => {
           selectedAppointment={selectedAppointment}
           onEditAppointment={handleEditEvent}
           onDeleteAppointment={handleDeleteEvent}
-          locale={locale} // Przekazanie locale do SchedulerComponent
+          locale={locale} 
         />
         <EventDialog
           open={openDialog}
