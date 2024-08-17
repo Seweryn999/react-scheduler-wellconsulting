@@ -1,8 +1,8 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import plLocale from "date-fns/locale/pl";
+import plLocale from "date-fns/locale/pl"; 
 import {
   collection,
   addDoc,
@@ -12,88 +12,85 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { firestore } from "./firebaseConfig";
-
 import ToolbarComponent from "./components/Toolbar";
 import EventDialog from "./components/EventDialog";
 import SchedulerComponent from "./components/Scheduler";
 
 const MySchedulerComponent = () => {
-  const [data, setData] = React.useState([]);
-  const [currentViewName, setCurrentViewName] = React.useState(
+  const [data, setData] = useState([]);
+  const [currentViewName, setCurrentViewName] = useState(
     localStorage.getItem("currentViewName") || "Dzień"
   );
-  const [currentDateState, setCurrentDate] = React.useState(
+  const [currentDateState, setCurrentDate] = useState(
     localStorage.getItem("currentDate") || new Date()
   );
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [currentEvent, setCurrentEvent] = React.useState({
+  const [openDialog, setOpenDialog] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState({
     title: "",
     startDate: "",
     endDate: "",
     id: null,
   });
-  const [selectedAppointment, setSelectedAppointment] = React.useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  React.useEffect(() => {
-    const fetchEvents = async () => {
-      const eventsCollection = collection(firestore, "wydarzenia");
-      const eventsSnapshot = await getDocs(eventsCollection);
-      const eventsList = eventsSnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setData(eventsList);
-    };
 
+  const [locale] = useState(plLocale);
+
+  const fetchEvents = async () => {
+    const eventsCollection = collection(firestore, "wydarzenia");
+    const eventsSnapshot = await getDocs(eventsCollection);
+    const eventsList = eventsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setData(eventsList);
+  };
+
+  useEffect(() => {
     fetchEvents();
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem("currentDate", currentDateState);
   }, [currentDateState]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem("currentViewName", currentViewName);
   }, [currentViewName]);
 
   const commitChanges = async ({ added, changed, deleted }) => {
-    let updatedData = data;
+    let updatedData = [...data];
 
-    if (added) {
-      try {
+    try {
+      if (added) {
         const docRef = await addDoc(collection(firestore, "wydarzenia"), added);
-        updatedData = [...data, { id: docRef.id, ...added }];
-      } catch (e) {
-        console.error("Błąd dodawania dokumentu: ", e);
+        updatedData = [...updatedData, { id: docRef.id, ...added }];
       }
-    }
 
-    if (changed) {
-      try {
+      if (changed) {
         for (const id in changed) {
           await updateDoc(doc(firestore, "wydarzenia", id), changed[id]);
+          updatedData = updatedData.map((appointment) =>
+            changed[appointment.id]
+              ? { ...appointment, ...changed[appointment.id] }
+              : appointment
+          );
         }
-        updatedData = data.map((appointment) =>
-          changed[appointment.id]
-            ? { ...appointment, ...changed[appointment.id] }
-            : appointment
-        );
-      } catch (e) {
-        console.error("Błąd aktualizacji dokumentu: ", e);
       }
-    }
 
-    if (deleted !== undefined) {
-      try {
+      if (deleted !== undefined) {
         await deleteDoc(doc(firestore, "wydarzenia", deleted));
-        updatedData = data.filter((appointment) => appointment.id !== deleted);
-      } catch (e) {
-        console.error("Błąd usuwania dokumentu: ", e);
+        updatedData = updatedData.filter(
+          (appointment) => appointment.id !== deleted
+        );
       }
-    }
 
-    setData(updatedData);
+      setData(updatedData);
+      fetchEvents();
+    } catch (error) {
+      console.error("Błąd aktualizacji danych: ", error);
+    }
   };
 
   const handleDateChange = (daysToAdd) => {
@@ -111,25 +108,16 @@ const MySchedulerComponent = () => {
   const handleEditEvent = () => {
     if (selectedAppointment) {
       setIsEditing(true);
-      setCurrentEvent({
-        title: selectedAppointment.title,
-        startDate: selectedAppointment.startDate,
-        endDate: selectedAppointment.endDate,
-        id: selectedAppointment.id,
-      });
+      setCurrentEvent({ ...selectedAppointment });
       setOpenDialog(true);
     }
   };
 
   const handleDeleteEvent = () => {
-    if (selectedAppointment && selectedAppointment.id) {
+    if (selectedAppointment?.id) {
       commitChanges({ deleted: selectedAppointment.id });
       setSelectedAppointment(null);
     }
-  };
-
-  const handleAppointmentClick = (appointment) => {
-    setSelectedAppointment(appointment);
   };
 
   const handleSaveEvent = async () => {
@@ -143,14 +131,12 @@ const MySchedulerComponent = () => {
   };
 
   const handleEventChange = (e) => {
-    setCurrentEvent({
-      ...currentEvent,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setCurrentEvent((prevEvent) => ({ ...prevEvent, [name]: value }));
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns} locale={plLocale}>
+    <LocalizationProvider dateAdapter={AdapterDateFns} locale={locale}>
       <Paper>
         <ToolbarComponent
           onAddEvent={handleAddEvent}
@@ -163,10 +149,10 @@ const MySchedulerComponent = () => {
           setCurrentDate={setCurrentDate}
           setCurrentViewName={setCurrentViewName}
           commitChanges={commitChanges}
+          selectedAppointment={selectedAppointment}
           onEditAppointment={handleEditEvent}
           onDeleteAppointment={handleDeleteEvent}
-          selectedAppointment={selectedAppointment}
-          onAppointmentClick={handleAppointmentClick}
+          locale={locale} // Przekazanie locale do SchedulerComponent
         />
         <EventDialog
           open={openDialog}
