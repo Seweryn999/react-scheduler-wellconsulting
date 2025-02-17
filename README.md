@@ -15,9 +15,6 @@ A React-based event scheduler application that allows users to create, edit, and
 ## Table of Contents
 1. [Installation](#installation)
 2. [Usage](#usage)
-3. [Project Structure](#project-structure)
-4. [Components Overview](#components-overview)
-5. [Firebase Configuration](#firebase-configuration)
 
 ---
 
@@ -27,3 +24,34 @@ A React-based event scheduler application that allows users to create, edit, and
    ```bash
    git clone https://github.com/your-repository-url.git
    cd your-repository-folder
+
+
+2. Install dependencies:
+
+bash
+npm install
+Set up Firebase:
+
+Create a Firebase project at Firebase Console.
+Add a Firestore database and create a collection named wydarzenia.
+Configure the firebaseConfig.js file with your Firebase project's credentials.
+Start the development server:
+
+bash
+npm start
+The app should now be running at http://localhost:3000.
+
+## Usage
+Basic Actions:
+Add Event: Click the "Add" button in the toolbar to add a new event.
+Edit Event: Select an event in the scheduler and click "Edit".
+Delete Event: Select an event and click "Delete".
+Navigation:
+Navigate Dates: Use the date navigation buttons in the toolbar to move forward or backward by day.
+Change Views: Switch between different views (e.g., day, week, month) using the view selector.
+Data Persistence:
+All events are saved to the Firestore database in real time.
+The current view and date are saved to local storage to ensure the same view is loaded on a page refresh.
+Project Structure
+plaintext
+
