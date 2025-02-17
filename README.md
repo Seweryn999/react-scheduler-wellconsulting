@@ -1,6 +1,7 @@
 # My Scheduler Application
 
-A React-based event scheduler application that allows users to create, edit, and delete events. The application leverages Firebase for data persistence and Material-UI for the UI components.
+A React-based event scheduler application that allows users to create, edit, and delete events. The application leverages Firebase for data persistence and Material-UI for the UI components. This project was written for recruitment to WellConsulting and is alive at:  
+[React Scheduler for WellConsulting](https://seweryn999.github.io/react-scheduler-wellconsulting/).
 
 ## Features
 - **Event Management:** Add, edit, and delete events.
